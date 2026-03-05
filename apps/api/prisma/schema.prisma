@@ -1,0 +1,202 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  password      String
+  name          String
+  nickname      String   @unique
+  profileImage  String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  bandMembers           BandMember[]
+  organizationMembers   OrganizationMember[]
+}
+
+model Organization {
+  id          String   @id @default(uuid())
+  name        String
+  type        OrganizationType
+  description String?
+  profileImage String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  bands         Band[]
+  members       OrganizationMember[]
+  announcements Announcement[]
+}
+
+enum OrganizationType {
+  UNIVERSITY_CLUB
+  BAND_UNION
+  INDIE_COLLECTIVE
+  PLANNING_TEAM
+  OTHER
+}
+
+model OrganizationMember {
+  id             String   @id @default(uuid())
+  organizationId String
+  userId         String
+  role           OrgMemberRole @default(MEMBER)
+  joinedAt       DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  user         User         @relation(fields: [userId], references: [id])
+
+  @@unique([organizationId, userId])
+}
+
+enum OrgMemberRole {
+  ADMIN
+  MEMBER
+}
+
+model Announcement {
+  id             String   @id @default(uuid())
+  organizationId String
+  authorId       String
+  title          String
+  content        String
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+}
+
+model Band {
+  id             String   @id @default(uuid())
+  name           String
+  genre          String[]
+  description    String?
+  profileImage   String?
+  snsLinks       Json?
+  organizationId String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  members        BandMember[]
+  performances   PerformanceBand[]
+  reservations   Reservation[]
+}
+
+model BandMember {
+  id       String @id @default(uuid())
+  bandId   String
+  userId   String
+  role     BandMemberRole @default(MEMBER)
+  part     String?
+  joinedAt DateTime @default(now())
+
+  band Band @relation(fields: [bandId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([bandId, userId])
+}
+
+enum BandMemberRole {
+  ADMIN
+  MEMBER
+}
+
+model Performance {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  date        DateTime
+  venueId     String?
+  ticketPrice Int?
+  posterImage String?
+  status      PerformanceStatus @default(UPCOMING)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  venue Venue? @relation(fields: [venueId], references: [id])
+  bands PerformanceBand[]
+}
+
+enum PerformanceStatus {
+  UPCOMING
+  COMPLETED
+  CANCELLED
+}
+
+model PerformanceBand {
+  id            String @id @default(uuid())
+  performanceId String
+  bandId        String
+  playOrder     Int?
+
+  performance Performance @relation(fields: [performanceId], references: [id])
+  band        Band        @relation(fields: [bandId], references: [id])
+
+  @@unique([performanceId, bandId])
+}
+
+model Venue {
+  id            String   @id @default(uuid())
+  name          String
+  address       String
+  capacity      Int?
+  operatingHours String?
+  rentalFee     String?
+  description   String?
+  photos        String[]
+  managerId     String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  performances  Performance[]
+  availability  VenueAvailability[]
+  reservations  Reservation[]
+}
+
+model VenueAvailability {
+  id      String   @id @default(uuid())
+  venueId String
+  date    DateTime
+  status  AvailabilityStatus @default(AVAILABLE)
+
+  venue Venue @relation(fields: [venueId], references: [id])
+
+  @@unique([venueId, date])
+}
+
+enum AvailabilityStatus {
+  AVAILABLE
+  BOOKED
+  BLOCKED
+}
+
+model Reservation {
+  id        String   @id @default(uuid())
+  bandId    String
+  venueId   String
+  date      DateTime
+  startTime String?
+  endTime   String?
+  status    ReservationStatus @default(PENDING)
+  message   String?
+  response  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  band  Band  @relation(fields: [bandId], references: [id])
+  venue Venue @relation(fields: [venueId], references: [id])
+}
+
+enum ReservationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}

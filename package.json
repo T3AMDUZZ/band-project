@@ -1,0 +1,11 @@
+{
+  "name": "band-project",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --parallel -r run dev",
+    "dev:api": "pnpm --filter @band-project/api dev",
+    "dev:web": "pnpm --filter @band-project/web dev",
+    "build": "pnpm -r run build",
+    "lint": "pnpm -r run lint"
+  }
+}
