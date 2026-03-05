@@ -4,7 +4,7 @@ import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 
 export const metadata: Metadata = {
-  title: '밴드플랫폼 - 대전 밴드 생태계 통합 플랫폼',
+  title: 'We are Live - 대전 밴드 생태계 통합 플랫폼',
   description: '대전 지역 밴드 · 동아리 · 공연장을 연결하는 조직 기반 공연·소통·예약 통합 플랫폼',
 };
 

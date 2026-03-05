@@ -19,7 +19,7 @@ export default function Header() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
-            <span className="text-xl font-bold text-indigo-600">밴드플랫폼</span>
+            <span className="text-xl font-bold text-indigo-600">We are Live</span>
           </Link>
 
           {/* Desktop Navigation */}
