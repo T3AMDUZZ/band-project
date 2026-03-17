@@ -5,6 +5,8 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { mockOrganizations, mockBands } from '@/lib/mock-data';
 
+const BAND_COLORS = ['#F97316', '#06B6D4', '#A855F7', '#EC4899', '#22C55E', '#EAB308', '#EF4444', '#6366F1'];
+
 const typeLabels: Record<string, string> = {
   UNIVERSITY_CLUB: '대학 동아리',
   BAND_UNION: '밴드 연합',
@@ -12,9 +14,9 @@ const typeLabels: Record<string, string> = {
 };
 
 const typeBadgeStyles: Record<string, string> = {
-  UNIVERSITY_CLUB: 'bg-blue-100 text-blue-700',
-  BAND_UNION: 'bg-purple-100 text-purple-700',
-  INDIE_COLLECTIVE: 'bg-orange-100 text-orange-700',
+  UNIVERSITY_CLUB: 'bg-blue-500/10 text-blue-400 border border-blue-500/20',
+  BAND_UNION: 'bg-purple-500/10 text-purple-400 border border-purple-500/20',
+  INDIE_COLLECTIVE: 'bg-orange-500/10 text-orange-400 border border-orange-500/20',
 };
 
 const mockNotices = [
@@ -47,159 +49,115 @@ export default function OrganizationDetailPage() {
   if (!org) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-gray-500">조직을 찾을 수 없습니다.</p>
+        <p className="text-muted">조직을 찾을 수 없습니다.</p>
       </div>
     );
   }
 
-  // For demo purposes, show a subset of bands based on org
   const relatedBands = mockBands.slice(0, org.bandCount > mockBands.length ? mockBands.length : org.bandCount);
 
   return (
-    <section className="py-16">
+    <section className="py-16 min-h-screen">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Back link */}
-        <Link
-          href="/organizations"
-          className="text-sm text-indigo-600 hover:text-indigo-700 transition-colors"
-        >
+        <Link href="/organizations" className="text-sm text-accent hover:text-accent-hover transition-colors">
           &larr; 조직 목록으로
         </Link>
 
         {/* Profile Header */}
-        <div className="mt-6 flex items-center gap-6">
-          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center flex-shrink-0">
-            <span className="text-2xl font-bold text-white">
-              {org.name.charAt(0)}
-            </span>
+        <div className="mt-6 flex items-center gap-6 animate-fade-up">
+          <div className="w-20 h-20 rounded-[14px] bg-gradient-to-br from-accent to-accent-hover flex items-center justify-center flex-shrink-0 shadow-[0_8px_28px_rgba(245,158,11,0.25)]">
+            <span className="text-2xl font-display text-surface">{org.name.charAt(0)}</span>
           </div>
           <div>
             <div className="flex items-center gap-3">
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{org.name}</h1>
-              <Link
-                href={`/organizations/${org.id}/edit`}
-                className="px-3 py-1 text-xs font-medium border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors"
-              >
+              <h1 className="font-display text-2xl sm:text-3xl tracking-[2px] text-stone-50">{org.name}</h1>
+              <Link href={`/organizations/${org.id}/edit`} className="px-3 py-1 text-xs font-medium border border-white/[0.07] rounded-lg text-muted hover:text-accent hover:border-accent/30 transition-colors">
                 수정
               </Link>
             </div>
-            <span
-              className={`inline-block mt-2 px-2.5 py-0.5 text-xs font-medium rounded-full ${typeBadgeStyles[org.type] || 'bg-gray-100 text-gray-700'}`}
-            >
+            <span className={`inline-block mt-2 px-2.5 py-0.5 text-[10px] font-mono-space tracking-wider rounded-full ${typeBadgeStyles[org.type] || 'bg-white/[0.04] text-muted'}`}>
               {typeLabels[org.type] || org.type}
             </span>
-            <p className="mt-2 text-sm text-gray-500">
+            <p className="mt-2 text-sm text-muted font-mono-space">
               산하 밴드 {org.bandCount}개 · 멤버 {org.memberCount}명
             </p>
           </div>
         </div>
 
         {/* Tabs */}
-        <div className="mt-10 flex gap-6 border-b border-gray-200">
+        <div className="mt-10 flex gap-6 border-b border-white/[0.07]">
           {tabs.map((tab) => (
-            <button
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key)}
+            <button key={tab.key} onClick={() => setActiveTab(tab.key)}
               className={`pb-3 text-sm font-medium transition-colors ${
-                activeTab === tab.key
-                  ? 'border-b-2 border-indigo-600 text-indigo-600'
-                  : 'text-gray-500 hover:text-gray-700'
+                activeTab === tab.key ? 'border-b-2 border-accent text-accent' : 'text-muted hover:text-stone-50'
               }`}
-            >
-              {tab.label}
-            </button>
+            >{tab.label}</button>
           ))}
         </div>
 
         {/* Tab Content */}
         <div className="mt-8">
-          {/* Bands Tab */}
           {activeTab === 'bands' && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {relatedBands.map((band) => (
-                <Link
-                  key={band.id}
-                  href={`/bands/${band.id}`}
-                  className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow p-5 group"
+              {relatedBands.map((band, i) => (
+                <Link key={band.id} href={`/bands/${band.id}`}
+                  className="bg-surface-card border border-white/[0.07] rounded-[14px] hover:border-white/[0.15] transition-all p-5 group"
                 >
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center flex-shrink-0">
-                      <span className="text-sm font-bold text-white">
-                        {band.name.charAt(0)}
-                      </span>
-                    </div>
+                    <div className="w-12 h-12 rounded-[11px] flex items-center justify-center flex-shrink-0 font-display text-surface"
+                      style={{ background: BAND_COLORS[i % BAND_COLORS.length] }}
+                    >{band.name.charAt(0)}</div>
                     <div className="min-w-0">
-                      <h3 className="text-base font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors truncate">
-                        {band.name}
-                      </h3>
-                      <p className="text-sm text-gray-500 truncate">{band.description}</p>
+                      <h3 className="text-base font-bold text-stone-50 group-hover:text-accent transition-colors truncate">{band.name}</h3>
+                      <p className="text-sm text-muted truncate">{band.description}</p>
                     </div>
                   </div>
                   <div className="mt-3 flex items-center justify-between">
                     <div className="flex flex-wrap gap-1.5">
                       {band.genre.map((g) => (
-                        <span
-                          key={g}
-                          className="inline-block px-2 py-0.5 text-xs font-medium bg-indigo-100 text-indigo-700 rounded-full"
-                        >
-                          {g}
-                        </span>
+                        <span key={g} className="inline-block px-2 py-0.5 text-[10px] font-mono-space tracking-wider bg-accent/10 text-accent rounded">{g}</span>
                       ))}
                     </div>
-                    <span className="text-xs text-gray-400">멤버 {band.memberCount}명</span>
+                    <span className="text-[10px] font-mono-space text-muted">멤버 {band.memberCount}명</span>
                   </div>
                 </Link>
               ))}
-              {relatedBands.length === 0 && (
-                <p className="text-gray-400 col-span-2">등록된 산하 밴드가 없습니다.</p>
-              )}
+              {relatedBands.length === 0 && <p className="text-muted col-span-2">등록된 산하 밴드가 없습니다.</p>}
             </div>
           )}
 
-          {/* Notices Tab */}
           {activeTab === 'notices' && (
             <div className="space-y-1">
               {mockNotices.map((notice) => (
-                <div
-                  key={notice.id}
-                  className="p-4 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
-                >
+                <div key={notice.id} className="p-4 rounded-[14px] hover:bg-white/[0.03] transition-colors cursor-pointer">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-bold text-gray-900">{notice.title}</h3>
-                    <span className="text-xs text-gray-400 flex-shrink-0 ml-4">{notice.createdAt}</span>
+                    <h3 className="text-sm font-bold text-stone-50">{notice.title}</h3>
+                    <span className="text-xs text-muted font-mono-space flex-shrink-0 ml-4">{notice.createdAt}</span>
                   </div>
-                  <p className="mt-1 text-sm text-gray-500 line-clamp-1">{notice.content}</p>
+                  <p className="mt-1 text-sm text-muted line-clamp-1">{notice.content}</p>
                 </div>
               ))}
             </div>
           )}
 
-          {/* Members Tab */}
           {activeTab === 'members' && (
             <div className="space-y-2">
               {mockMembers.map((member) => (
-                <div
-                  key={member.name}
-                  className="flex items-center justify-between p-4 bg-white rounded-lg shadow-sm"
-                >
+                <div key={member.name} className="flex items-center justify-between p-4 bg-surface-card border border-white/[0.07] rounded-[14px]">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
-                      <span className="text-sm font-medium text-gray-600">
-                        {member.name.charAt(0)}
-                      </span>
+                    <div className="w-10 h-10 rounded-[11px] bg-surface-elevated flex items-center justify-center">
+                      <span className="text-sm font-medium text-subtle">{member.name.charAt(0)}</span>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-900">{member.name}</p>
-                      <p className="text-xs text-gray-400">{member.joinedAt} 가입</p>
+                      <p className="text-sm font-bold text-stone-50">{member.name}</p>
+                      <p className="text-xs text-muted font-mono-space">{member.joinedAt} 가입</p>
                     </div>
                   </div>
-                  <span
-                    className={`px-2 py-0.5 text-xs font-medium rounded-full ${
-                      member.role === 'ADMIN'
-                        ? 'bg-red-100 text-red-700'
-                        : 'bg-gray-100 text-gray-600'
-                    }`}
-                  >
+                  <span className={`px-2 py-0.5 text-[10px] font-mono-space font-medium rounded-full ${
+                    member.role === 'ADMIN'
+                      ? 'bg-red-500/10 text-red-400 border border-red-500/20'
+                      : 'bg-white/[0.04] text-muted border border-white/[0.07]'
+                  }`}>
                     {member.role === 'ADMIN' ? '관리자' : '멤버'}
                   </span>
                 </div>

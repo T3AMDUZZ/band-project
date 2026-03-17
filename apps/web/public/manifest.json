@@ -1,0 +1,21 @@
+{
+  "name": "We are Live",
+  "short_name": "WeareLive",
+  "description": "대전 밴드 생태계 통합 플랫폼",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0C0A09",
+  "theme_color": "#F59E0B",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

@@ -3,6 +3,8 @@
 import Link from 'next/link';
 import { mockBands, mockOrganizations } from '@/lib/mock-data';
 
+const BAND_COLORS = ['#F97316', '#06B6D4', '#A855F7', '#EC4899', '#22C55E'];
+
 const mockUser = {
   name: '김민수',
   nickname: 'minsu_band',
@@ -16,10 +18,10 @@ const myReservations = [
 ];
 
 const statusBadge: Record<string, string> = {
-  PENDING: 'bg-yellow-100 text-yellow-700',
-  APPROVED: 'bg-green-100 text-green-700',
-  REJECTED: 'bg-red-100 text-red-700',
-  CANCELLED: 'bg-gray-100 text-gray-500',
+  PENDING: 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20',
+  APPROVED: 'bg-green-500/10 text-green-500 border border-green-500/20',
+  REJECTED: 'bg-red-500/10 text-red-500 border border-red-500/20',
+  CANCELLED: 'bg-white/[0.04] text-muted border border-white/[0.07]',
 };
 
 const statusLabel: Record<string, string> = {
@@ -34,26 +36,26 @@ export default function MyPage() {
   const myOrgs = mockOrganizations.slice(0, 1);
 
   return (
-    <section className="py-16 bg-gray-50 min-h-screen">
+    <section className="py-16 min-h-screen">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Profile */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
+        <div className="bg-surface-card border border-white/[0.07] rounded-[14px] p-6 mb-8 animate-fade-up">
           <div className="flex items-center gap-5">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center flex-shrink-0">
-              <span className="text-2xl font-bold text-white">
+            <div className="w-[76px] h-[76px] rounded-[14px] bg-gradient-to-br from-accent to-accent-hover flex items-center justify-center flex-shrink-0 shadow-[0_8px_28px_rgba(245,158,11,0.25)]">
+              <span className="text-2xl font-display text-surface">
                 {mockUser.name.charAt(0)}
               </span>
             </div>
             <div>
-              <h1 className="text-xl font-bold text-gray-900">{mockUser.name}</h1>
-              <p className="text-sm text-gray-500">@{mockUser.nickname}</p>
-              <p className="text-sm text-gray-500">{mockUser.email}</p>
+              <h1 className="text-xl font-bold text-stone-50">{mockUser.name}</h1>
+              <p className="text-sm text-muted font-mono-space">@{mockUser.nickname}</p>
+              <p className="text-sm text-muted">{mockUser.email}</p>
             </div>
           </div>
           <div className="mt-5">
             <button
               onClick={() => alert('프로필 수정 페이지로 이동합니다.')}
-              className="px-5 py-2 border border-indigo-600 text-indigo-600 font-semibold rounded-lg hover:bg-indigo-50 transition-colors"
+              className="px-5 py-2 border border-accent/30 text-accent font-bold rounded-lg hover:bg-accent/10 transition-colors text-sm"
             >
               프로필 수정
             </button>
@@ -61,31 +63,37 @@ export default function MyPage() {
         </div>
 
         {/* My Bands */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">내 밴드</h2>
+        <div className="bg-surface-card border border-white/[0.07] rounded-[14px] p-6 mb-8">
+          <div className="flex items-center gap-3 mb-4">
+            <h2 className="font-display text-[16px] tracking-[2px] text-muted">MY BANDS</h2>
+            <span className="flex-1 h-px bg-white/[0.07]" />
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {myBands.map((band) => (
+            {myBands.map((band, i) => (
               <Link
                 key={band.id}
                 href={`/bands/${band.id}`}
-                className="p-4 border rounded-lg hover:bg-gray-50 transition-colors group"
+                className="p-4 border border-white/[0.07] rounded-[14px] hover:border-white/[0.15] transition-all group"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center flex-shrink-0">
-                    <span className="text-sm font-bold text-white">{band.name.charAt(0)}</span>
+                  <div
+                    className="w-10 h-10 rounded-[11px] flex items-center justify-center flex-shrink-0 font-display text-surface"
+                    style={{ background: BAND_COLORS[i % BAND_COLORS.length] }}
+                  >
+                    {band.name.charAt(0)}
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">
+                    <h3 className="font-bold text-stone-50 group-hover:text-accent transition-colors">
                       {band.name}
                     </h3>
-                    <p className="text-xs text-gray-500">{band.description}</p>
+                    <p className="text-xs text-muted">{band.description}</p>
                   </div>
                 </div>
                 <div className="mt-3 flex flex-wrap gap-1.5">
                   {band.genre.map((g) => (
                     <span
                       key={g}
-                      className="inline-block px-2 py-0.5 text-xs font-medium bg-indigo-100 text-indigo-700 rounded-full"
+                      className="inline-block px-2 py-0.5 text-[10px] font-mono-space tracking-wider bg-accent/10 text-accent border border-accent/20 rounded"
                     >
                       {g}
                     </span>
@@ -97,19 +105,22 @@ export default function MyPage() {
         </div>
 
         {/* My Organizations */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">내 조직</h2>
+        <div className="bg-surface-card border border-white/[0.07] rounded-[14px] p-6 mb-8">
+          <div className="flex items-center gap-3 mb-4">
+            <h2 className="font-display text-[16px] tracking-[2px] text-muted">MY ORGANIZATIONS</h2>
+            <span className="flex-1 h-px bg-white/[0.07]" />
+          </div>
           <div className="space-y-4">
             {myOrgs.map((org) => (
               <Link
                 key={org.id}
                 href={`/organizations/${org.id}`}
-                className="block p-4 border rounded-lg hover:bg-gray-50 transition-colors group"
+                className="block p-4 border border-white/[0.07] rounded-[14px] hover:border-white/[0.15] transition-all group"
               >
-                <h3 className="font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">
+                <h3 className="font-bold text-stone-50 group-hover:text-accent transition-colors">
                   {org.name}
                 </h3>
-                <div className="mt-2 flex gap-4 text-sm text-gray-500">
+                <div className="mt-2 flex gap-4 text-sm text-muted font-mono-space text-xs">
                   <span>밴드 {org.bandCount}개</span>
                   <span>멤버 {org.memberCount}명</span>
                 </div>
@@ -119,17 +130,20 @@ export default function MyPage() {
         </div>
 
         {/* My Reservations */}
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">내 예약</h2>
+        <div className="bg-surface-card border border-white/[0.07] rounded-[14px] p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <h2 className="font-display text-[16px] tracking-[2px] text-muted">MY RESERVATIONS</h2>
+            <span className="flex-1 h-px bg-white/[0.07]" />
+          </div>
           <div className="space-y-4">
             {myReservations.map((r) => (
-              <div key={r.id} className="p-4 border rounded-lg">
+              <div key={r.id} className="p-4 border border-white/[0.07] rounded-[14px]">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="font-semibold text-gray-900">{r.venue}</h3>
-                    <p className="text-sm text-gray-500">{r.date}</p>
+                    <h3 className="font-bold text-stone-50">{r.venue}</h3>
+                    <p className="text-sm text-muted font-mono-space">{r.date}</p>
                   </div>
-                  <span className={`px-3 py-1 text-xs font-medium rounded-full ${statusBadge[r.status]}`}>
+                  <span className={`px-3 py-1 text-xs font-mono-space font-medium rounded-full ${statusBadge[r.status]}`}>
                     {statusLabel[r.status]}
                   </span>
                 </div>

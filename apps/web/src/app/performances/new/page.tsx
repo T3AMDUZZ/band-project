@@ -1,149 +1,114 @@
 'use client';
 
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { mockVenues, mockBands } from '@/lib/mock-data';
+import { createPerformance, assignBandToPerformance } from '@/lib/api/performances';
+import { getVenues } from '@/lib/api/venues';
+import { getBands } from '@/lib/api/bands';
+
+const inputClass = "w-full p-3 bg-surface border border-white/[0.07] rounded-lg text-stone-50 text-sm placeholder-muted focus:ring-2 focus:ring-accent/50 focus:border-accent/30 outline-none transition-all";
 
 export default function NewPerformancePage() {
-  const handleSubmit = (e: React.FormEvent) => {
+  const router = useRouter();
+  const [venues, setVenues] = useState<any[]>([]);
+  const [bands, setBands] = useState<any[]>([]);
+  const [title, setTitle] = useState('');
+  const [datetime, setDatetime] = useState('');
+  const [venueId, setVenueId] = useState('');
+  const [price, setPrice] = useState('');
+  const [description, setDescription] = useState('');
+  const [selectedBands, setSelectedBands] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    getVenues().then(setVenues).catch(() => {});
+    getBands().then(setBands).catch(() => {});
+  }, []);
+
+  const toggleBand = (id: string) => {
+    setSelectedBands((prev) => prev.includes(id) ? prev.filter((b) => b !== id) : [...prev, id]);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    alert('API 연동 후 사용 가능합니다');
+    setLoading(true);
+    setError('');
+    try {
+      const perf = await createPerformance({
+        title,
+        date: datetime,
+        venueId: venueId || undefined,
+        ticketPrice: price ? parseInt(price) : undefined,
+        description: description || undefined,
+      });
+      // 출연 밴드 배정
+      for (let i = 0; i < selectedBands.length; i++) {
+        await assignBandToPerformance(perf.id, { bandId: selectedBands[i], playOrder: i + 1 });
+      }
+      router.push('/performances');
+    } catch (err: any) {
+      setError(err.response?.data?.message || '공연 등록에 실패했습니다.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <section className="py-12 bg-gray-50 min-h-screen">
+    <section className="py-12 min-h-screen">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-3xl sm:text-4xl font-bold text-gray-900">공연 등록</h1>
-        <p className="mt-2 text-gray-500">새로운 공연 정보를 입력하세요</p>
-
-        <form onSubmit={handleSubmit} className="mt-8 space-y-6">
-          {/* 공연 제목 */}
+        <div className="flex items-center gap-3 mb-2">
+          <h1 className="font-display text-[22px] tracking-[3px] text-muted">NEW PERFORMANCE</h1>
+          <span className="flex-1 h-px bg-white/[0.07]" />
+        </div>
+        <p className="text-sm text-muted mb-8">새로운 공연 정보를 입력하세요</p>
+        {error && <div className="mb-4 px-4 py-2.5 bg-red-500/10 border border-red-500/20 text-red-400 text-sm rounded-lg">{error}</div>}
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
-              공연 제목
-            </label>
-            <input
-              type="text"
-              id="title"
-              placeholder="공연 제목을 입력하세요"
-              className="border border-gray-300 rounded-lg p-3 w-full focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
-            />
+            <label className="block text-[11px] font-mono-space text-muted mb-2">공연 제목</label>
+            <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="공연 제목을 입력하세요" className={inputClass} required />
           </div>
-
-          {/* 날짜/시간 */}
           <div>
-            <label htmlFor="datetime" className="block text-sm font-medium text-gray-700 mb-1">
-              공연 날짜 / 시간
-            </label>
-            <input
-              type="datetime-local"
-              id="datetime"
-              className="border border-gray-300 rounded-lg p-3 w-full focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
-            />
+            <label className="block text-[11px] font-mono-space text-muted mb-2">공연 날짜 / 시간</label>
+            <input type="datetime-local" value={datetime} onChange={(e) => setDatetime(e.target.value)} className={inputClass} required />
           </div>
-
-          {/* 공연장 선택 */}
           <div>
-            <label htmlFor="venue" className="block text-sm font-medium text-gray-700 mb-1">
-              공연장
-            </label>
-            <select
-              id="venue"
-              className="border border-gray-300 rounded-lg p-3 w-full focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition bg-white"
-              defaultValue=""
-            >
-              <option value="" disabled>
-                공연장을 선택하세요
-              </option>
-              {mockVenues.map((venue) => (
-                <option key={venue.id} value={venue.id}>
-                  {venue.name} ({venue.address})
-                </option>
-              ))}
+            <label className="block text-[11px] font-mono-space text-muted mb-2">공연장</label>
+            <select value={venueId} onChange={(e) => setVenueId(e.target.value)} className={inputClass}>
+              <option value="">공연장을 선택하세요</option>
+              {venues.map((v: any) => (<option key={v.id} value={v.id}>{v.name} ({v.address})</option>))}
             </select>
           </div>
-
-          {/* 입장료 */}
           <div>
-            <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-1">
-              입장료 (원)
-            </label>
-            <input
-              type="number"
-              id="price"
-              min={0}
-              placeholder="0"
-              className="border border-gray-300 rounded-lg p-3 w-full focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
-            />
+            <label className="block text-[11px] font-mono-space text-muted mb-2">입장료 (원)</label>
+            <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} min={0} placeholder="0" className={inputClass} />
           </div>
-
-          {/* 출연 밴드 */}
           <div>
-            <span className="block text-sm font-medium text-gray-700 mb-2">출연 밴드</span>
-            <div className="bg-white border border-gray-300 rounded-lg p-4 space-y-2 max-h-48 overflow-y-auto">
-              {mockBands.map((band) => (
+            <span className="block text-[11px] font-mono-space text-muted mb-2">출연 밴드</span>
+            <div className="bg-surface-card border border-white/[0.07] rounded-[14px] p-4 space-y-2 max-h-48 overflow-y-auto">
+              {bands.length === 0 && <p className="text-xs text-muted">등록된 밴드가 없습니다</p>}
+              {bands.map((band: any) => (
                 <label key={band.id} className="flex items-center gap-3 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    value={band.id}
-                    className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
-                  />
-                  <span className="text-sm text-gray-900">{band.name}</span>
+                  <input type="checkbox" checked={selectedBands.includes(band.id)} onChange={() => toggleBand(band.id)} className="w-4 h-4 accent-amber-500" />
+                  <span className="text-sm text-stone-50">{band.name}</span>
                   <div className="flex gap-1">
-                    {band.genre.map((g) => (
-                      <span
-                        key={g}
-                        className="inline-block px-2 py-0.5 text-xs font-medium bg-indigo-100 text-indigo-700 rounded-full"
-                      >
-                        {g}
-                      </span>
+                    {(band.genre || []).map((g: string) => (
+                      <span key={g} className="px-2 py-0.5 text-[10px] font-mono-space tracking-wider bg-accent/10 text-accent rounded">{g}</span>
                     ))}
                   </div>
                 </label>
               ))}
             </div>
           </div>
-
-          {/* 공연 설명 */}
           <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
-              공연 설명
-            </label>
-            <textarea
-              id="description"
-              rows={4}
-              placeholder="공연에 대한 설명을 입력하세요"
-              className="border border-gray-300 rounded-lg p-3 w-full focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition resize-none"
-            />
+            <label className="block text-[11px] font-mono-space text-muted mb-2">공연 설명</label>
+            <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={4} placeholder="공연에 대한 설명을 입력하세요" className={`${inputClass} resize-none`} />
           </div>
-
-          {/* 포스터 이미지 */}
-          <div>
-            <label htmlFor="poster" className="block text-sm font-medium text-gray-700 mb-1">
-              포스터 이미지
-            </label>
-            <input
-              type="file"
-              id="poster"
-              accept="image/*"
-              disabled
-              className="border border-gray-300 rounded-lg p-3 w-full bg-gray-100 text-gray-400 cursor-not-allowed"
-            />
-            <p className="mt-1 text-xs text-gray-400">이미지 업로드는 추후 지원 예정입니다</p>
-          </div>
-
-          {/* Buttons */}
           <div className="flex items-center justify-between pt-4">
-            <Link
-              href="/performances"
-              className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
-            >
-              &larr; 취소
-            </Link>
-            <button
-              type="submit"
-              className="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition-colors font-medium"
-            >
-              등록하기
+            <Link href="/performances" className="text-sm font-medium text-muted hover:text-accent transition-colors">&larr; 취소</Link>
+            <button type="submit" disabled={loading} className="bg-accent text-surface px-6 py-3 rounded-lg hover:bg-accent-hover transition-colors font-bold disabled:opacity-50">
+              {loading ? '등록 중...' : '등록하기'}
             </button>
           </div>
         </form>

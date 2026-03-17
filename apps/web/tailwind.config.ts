@@ -7,7 +7,29 @@ const config: Config = {
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        surface: {
+          DEFAULT: '#0C0A09',
+          card: '#1C1917',
+          elevated: '#292524',
+        },
+        accent: {
+          DEFAULT: '#F59E0B',
+          hover: '#F97316',
+        },
+        muted: '#78716C',
+        subtle: '#A8A29E',
+      },
+      fontFamily: {
+        display: ['Bebas Neue', 'sans-serif'],
+        'mono-space': ['Space Mono', 'monospace'],
+        sans: ['Noto Sans KR', '-apple-system', 'sans-serif'],
+      },
+      borderColor: {
+        DEFAULT: 'rgba(255, 255, 255, 0.07)',
+      },
+    },
   },
   plugins: [],
 };
