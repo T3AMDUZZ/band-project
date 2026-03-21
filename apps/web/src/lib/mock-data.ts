@@ -77,6 +77,46 @@ export const allBookings = [
   { date: '2026-04-12', venueId: '1', band: '보라색 연기', time: '20:00' },
 ];
 
+// ── 합주·리허설 일정 (일정 페이지 > 합주 트랙) ──
+export const mockRehearsals = [
+  {
+    id: 'r1',
+    title: '블루밍사운드 정기 합주',
+    date: '2026-03-19T19:00:00',
+    place: '충남대 동아리 연습실 A',
+    bandId: '1',
+    bandName: '블루밍사운드',
+    note: '신곡 셋리스트 정리',
+  },
+  {
+    id: 'r2',
+    title: '선셋드라이브 앨범 준비 합주',
+    date: '2026-03-20T20:00:00',
+    place: '대전 유성구 합주실 스튜디오7',
+    bandId: '2',
+    bandName: '선셋드라이브',
+    note: '데모 트랙 3곡',
+  },
+  {
+    id: 'r3',
+    title: '연합 밴드 합동 리허설',
+    date: '2026-03-25T18:30:00',
+    place: '한밭대 밴드실',
+    bandId: '3',
+    bandName: '미드나잇 크루',
+    note: '정기공연 출연진 맞춤 연습',
+  },
+  {
+    id: 'r4',
+    title: '인디 연합 워크숍',
+    date: '2026-04-02T15:00:00',
+    place: '라이브홀 루트 리허설룸',
+    bandId: '5',
+    bandName: '노이즈가든',
+    note: '게스트 합주 포함',
+  },
+] as const;
+
 // ── 기존 호환 데이터 ──
 export const mockPerformances = [
   {

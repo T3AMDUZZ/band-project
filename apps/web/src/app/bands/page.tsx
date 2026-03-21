@@ -92,6 +92,53 @@ export default function BandsPage() {
         </div>
       </div>
 
+      {/* ── 내 밴드 (상단 고정) ── */}
+      <div id="my-band" className="scroll-mt-28 mb-8">
+        <div className="flex items-center gap-3 mb-3">
+          <h2 className="font-display text-[14px] tracking-[2px] text-accent">내 밴드</h2>
+          <span className="flex-1 h-px bg-white/[0.07]" />
+        </div>
+        <Link
+          href="/myband"
+          className="flex items-center gap-4 p-4 bg-surface-card border border-accent/25 rounded-[14px] hover:border-accent/50 transition-all group"
+        >
+          <div
+            className="w-14 h-14 rounded-[11px] flex-shrink-0 flex items-center justify-center font-display text-2xl text-surface"
+            style={{ background: BAND_COLORS[0] }}
+          >
+            {myBand.name.charAt(0)}
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-[15px] font-black text-stone-50 group-hover:text-accent transition-colors">
+                {myBand.name}
+              </span>
+              <span className="text-[10px] px-2 py-0.5 rounded bg-accent/15 text-accent border border-accent/30 font-mono-space font-bold">
+                MY
+              </span>
+            </div>
+            <p className="text-xs text-muted mt-1">{myBand.description}</p>
+            <div className="flex gap-1.5 flex-wrap mt-2">
+              {myBand.genre.map((g) => (
+                <span
+                  key={g}
+                  className="text-[10px] px-[7px] py-[2px] rounded bg-white/[0.04] text-muted font-mono-space tracking-wider"
+                >
+                  {g}
+                </span>
+              ))}
+            </div>
+          </div>
+          <span className="text-sm text-accent font-semibold flex-shrink-0">대시보드 →</span>
+        </Link>
+      </div>
+
+      {/* ── 다른 밴드 ── */}
+      <div className="flex items-center gap-3 mb-4">
+        <h2 className="font-display text-[14px] tracking-[2px] text-muted">다른 밴드</h2>
+        <span className="flex-1 h-px bg-white/[0.07]" />
+      </div>
+
       {/* ── ALL SHOWS PANEL ── */}
       {showAllShows && (
         <div className="bg-surface-card border border-white/[0.07] rounded-[14px] p-[18px] mb-5">

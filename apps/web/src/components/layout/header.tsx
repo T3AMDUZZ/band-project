@@ -5,10 +5,9 @@ import Link from 'next/link';
 import NotificationBell from '@/components/notifications/notification-bell';
 
 const navLinks = [
-  { href: '/myband', label: '내 밴드' },
-  { href: '/bands', label: '다른 밴드' },
-  { href: '/performances', label: '공연' },
-  { href: '/venues', label: '공연장' },
+  { href: '/bands', label: '밴드' },
+  { href: '/performances', label: '일정' },
+  { href: '/venues', label: '대관' },
 ];
 
 export default function Header() {
@@ -20,7 +19,7 @@ export default function Header() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
-            <span className="font-display text-2xl tracking-[3px] text-accent">WE ARE LIVE</span>
+            <span className="font-display text-2xl tracking-[3px] header-logo-pastel-sky">WE ARE LIVE</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -41,9 +40,9 @@ export default function Header() {
             <NotificationBell />
             <Link
               href="/admin"
-              className="px-3.5 py-[6px] rounded-lg border border-accent/30 bg-accent/10 text-accent text-[13px] font-semibold hover:bg-accent/20 transition-all"
+              className="header-admin-pastel-sky px-3.5 py-[6px] rounded-lg border text-[13px] font-semibold transition-all"
             >
-              🏠 공연장 관리
+              🏠 대관 관리
             </Link>
             <Link
               href="/mypage"
@@ -93,10 +92,10 @@ export default function Header() {
             <hr className="my-2 border-white/[0.07]" />
             <Link
               href="/admin"
-              className="block px-3 py-2 rounded-lg text-base font-medium text-accent hover:bg-accent/10"
+              className="header-logo-pastel-sky header-admin-pastel-sky--mobile block px-3 py-2 rounded-lg text-base font-medium transition-colors"
               onClick={() => setMobileMenuOpen(false)}
             >
-              🏠 공연장 관리
+              🏠 대관 관리
             </Link>
             <Link
               href="/mypage"
