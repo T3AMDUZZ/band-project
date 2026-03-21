@@ -8,16 +8,16 @@ export default function VenuesPage() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <div className="flex items-center gap-3 mb-2">
-              <h1 className="font-display text-[18px] tracking-[3px] text-muted">VENUES</h1>
+              <h1 className="font-display text-[18px] tracking-[3px] text-muted">대관</h1>
               <span className="flex-1 h-px bg-white/[0.07] min-w-[40px]" />
             </div>
-            <p className="text-sm text-muted">대전 지역 공연장을 찾아보세요</p>
+            <p className="text-sm text-muted">대전 지역 공연장·연습 공간 대관 정보를 찾아보세요</p>
           </div>
           <Link
             href="/venues/new"
             className="px-6 py-2.5 bg-accent text-surface font-bold rounded-lg hover:bg-accent-hover transition-colors"
           >
-            공연장 등록
+            대관 등록
           </Link>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

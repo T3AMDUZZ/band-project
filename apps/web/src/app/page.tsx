@@ -16,14 +16,14 @@ export default function Home() {
               대전의 밴드 씬을 한눈에
             </h1>
             <p className="mt-4 text-lg sm:text-xl text-subtle max-w-2xl mx-auto">
-              밴드 · 동아리 · 공연장을 연결하는 통합 플랫폼
+              밴드 · 동아리 · 대관을 연결하는 통합 플랫폼
             </p>
             <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link
                 href="/performances"
                 className="w-full sm:w-auto px-8 py-3 bg-accent text-surface font-bold rounded-lg hover:bg-accent-hover transition-colors text-center"
               >
-                공연 둘러보기
+                일정 둘러보기
               </Link>
               <Link
                 href="/bands/new"
@@ -48,11 +48,13 @@ export default function Home() {
               href="/performances"
               className="text-sm font-medium text-accent hover:text-accent-hover transition-colors"
             >
-              더 보기 &rarr;
+              일정 전체 &rarr;
             </Link>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {mockPerformances.map((performance, i) => (
+            {mockPerformances
+              .filter((p) => p.status === 'UPCOMING')
+              .map((performance, i) => (
               <Link
                 key={performance.id}
                 href={`/performances/${performance.id}`}
@@ -161,7 +163,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-3">
-              <h2 className="font-display text-[18px] tracking-[3px] text-muted">VENUES</h2>
+              <h2 className="font-display text-[18px] tracking-[3px] text-muted">대관</h2>
               <span className="flex-1 h-px bg-white/[0.07] min-w-[40px]" />
             </div>
             <Link

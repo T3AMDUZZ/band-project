@@ -1,9 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { mockBands, mockOrganizations } from '@/lib/mock-data';
-
-const BAND_COLORS = ['#F97316', '#06B6D4', '#A855F7', '#EC4899', '#22C55E'];
+import { mockOrganizations } from '@/lib/mock-data';
 
 const mockUser = {
   name: '김민수',
@@ -32,7 +30,6 @@ const statusLabel: Record<string, string> = {
 };
 
 export default function MyPage() {
-  const myBands = mockBands.slice(0, 2);
   const myOrgs = mockOrganizations.slice(0, 1);
 
   return (
@@ -62,45 +59,29 @@ export default function MyPage() {
           </div>
         </div>
 
-        {/* My Bands */}
+        {/* My Bands — 통합 밴드 탭으로 안내 */}
         <div className="bg-surface-card border border-white/[0.07] rounded-[14px] p-6 mb-8">
           <div className="flex items-center gap-3 mb-4">
             <h2 className="font-display text-[16px] tracking-[2px] text-muted">MY BANDS</h2>
             <span className="flex-1 h-px bg-white/[0.07]" />
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {myBands.map((band, i) => (
-              <Link
-                key={band.id}
-                href={`/bands/${band.id}`}
-                className="p-4 border border-white/[0.07] rounded-[14px] hover:border-white/[0.15] transition-all group"
-              >
-                <div className="flex items-center gap-3">
-                  <div
-                    className="w-10 h-10 rounded-[11px] flex items-center justify-center flex-shrink-0 font-display text-surface"
-                    style={{ background: BAND_COLORS[i % BAND_COLORS.length] }}
-                  >
-                    {band.name.charAt(0)}
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-stone-50 group-hover:text-accent transition-colors">
-                      {band.name}
-                    </h3>
-                    <p className="text-xs text-muted">{band.description}</p>
-                  </div>
-                </div>
-                <div className="mt-3 flex flex-wrap gap-1.5">
-                  {band.genre.map((g) => (
-                    <span
-                      key={g}
-                      className="inline-block px-2 py-0.5 text-[10px] font-mono-space tracking-wider bg-accent/10 text-accent border border-accent/20 rounded"
-                    >
-                      {g}
-                    </span>
-                  ))}
-                </div>
-              </Link>
-            ))}
+          <p className="text-sm text-muted mb-4">
+            내 밴드는 <strong className="text-stone-50">밴드</strong> 메뉴 상단에서 다른 밴드와 함께 볼 수 있어요. 상세 대시보드는 마이 밴드 페이지로
+            이동합니다.
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href="/bands#my-band"
+              className="px-5 py-2.5 bg-accent text-surface font-bold rounded-lg hover:bg-accent-hover transition-colors text-sm"
+            >
+              밴드 보기 (내 밴드 + 다른 밴드)
+            </Link>
+            <Link
+              href="/myband"
+              className="px-5 py-2.5 border border-accent/40 text-accent font-semibold rounded-lg hover:bg-accent/10 transition-colors text-sm"
+            >
+              마이 밴드 대시보드
+            </Link>
           </div>
         </div>
 
