@@ -7,7 +7,8 @@ import NotificationBell from '@/components/notifications/notification-bell';
 const navLinks = [
   { href: '/myband', label: '내 밴드' },
   { href: '/bands', label: '다른 밴드' },
-  { href: '/performances', label: '공연' },
+  { href: '/schedule', label: '일정' },
+  { href: '/booking', label: '대관' },
   { href: '/venues', label: '공연장' },
 ];
 

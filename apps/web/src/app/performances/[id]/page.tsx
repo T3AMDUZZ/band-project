@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { mockPerformances } from '@/lib/mock-data';
+import { mockPerformances, mockSetlists } from '@/lib/mock-data';
 import { formatDate, formatPrice } from '@/lib/utils';
 
 const BAND_COLORS = ['#F97316', '#06B6D4', '#A855F7', '#EC4899', '#22C55E', '#EAB308', '#EF4444', '#6366F1'];
@@ -27,6 +27,7 @@ export default async function PerformanceDetailPage({ params }: Props) {
   }
 
   const statusLabel = performance.status === 'UPCOMING' ? '예정' : '종료';
+  const setlists = mockSetlists[id] || [];
 
   return (
     <section className="py-12 min-h-screen">
@@ -110,6 +111,41 @@ export default async function PerformanceDetailPage({ params }: Props) {
               </Link>
             ))}
           </div>
+        </div>
+
+        {/* Setlist */}
+        <div className="mt-10">
+          <div className="flex items-center gap-3 mb-4">
+            <h2 className="font-display text-[16px] tracking-[2px] text-muted">SETLIST</h2>
+            <span className="flex-1 h-px bg-white/[0.07]" />
+          </div>
+          {setlists.length === 0 ? (
+            <div className="bg-surface-card border border-white/[0.07] rounded-[14px] p-6 text-center">
+              <p className="text-muted text-sm">등록된 셋리스트가 없습니다.</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {setlists.map((sl) => {
+                const bandInfo = performance.bands.find((b) => b.id === sl.bandId);
+                return (
+                  <div key={sl.bandId} className="bg-surface-card border border-white/[0.07] rounded-[14px] p-5">
+                    <h3 className="font-bold text-stone-50 mb-3">{bandInfo?.name || sl.bandId}</h3>
+                    <div className="space-y-2">
+                      {sl.songs.map((song) => (
+                        <div key={song.order} className="flex items-center justify-between text-sm">
+                          <div className="flex items-center gap-3">
+                            <span className="w-6 h-6 rounded-full bg-white/[0.06] flex items-center justify-center text-xs font-mono-space text-muted">{song.order}</span>
+                            <span className="text-stone-50">{song.title}</span>
+                          </div>
+                          <span className="text-muted font-mono-space text-xs">{song.duration}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         {/* Back Button */}

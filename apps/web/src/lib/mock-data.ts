@@ -147,3 +147,76 @@ export const mockOrganizations = [
   { id: '2', name: '한밭대 밴드 연합', type: 'BAND_UNION', bandCount: 4, memberCount: 22 },
   { id: '3', name: '대전 인디 연합', type: 'INDIE_COLLECTIVE', bandCount: 8, memberCount: 40 },
 ];
+
+// 타입 정의
+export type Rehearsal = {
+  id: string;
+  bandId: string;
+  bandName: string;
+  title: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  location: string;
+  memo: string;
+};
+
+export type TimeVote = {
+  id: string;
+  bandId: string;
+  bandName: string;
+  title: string;
+  dates: string[];
+  timeSlots: string[];
+  votes: Record<string, Record<string, boolean>>;
+  createdAt: string;
+};
+
+export type TechRider = {
+  id: string;
+  bandId: string;
+  bandName: string;
+  vocals: number;
+  guitars: number;
+  bass: number;
+  drums: boolean;
+  keyboards: number;
+  monitors: number;
+  diBoxes: number;
+  mics: string[];
+  memo: string;
+};
+
+export type BandMember = {
+  id: string;
+  name: string;
+  part: string;
+  role: 'ADMIN' | 'MEMBER';
+};
+
+export type VenueTRTemplate = {
+  id: string;
+  venueName: string;
+  channels: number;
+  monitors: number;
+  mics: string[];
+  amps: string[];
+  drums: string;
+  memo: string;
+};
+
+export type Setlist = {
+  performanceId: string;
+  bandId: string;
+  songs: { order: number; title: string; duration: string }[];
+};
+
+// 빈 데이터 (API 연동 전 — 빈 상태 UI 표시용)
+export const mockRehearsals: Rehearsal[] = [];
+export const mockTimeVotes: TimeVote[] = [];
+export const mockTechRiders: TechRider[] = [];
+export const mockSetlists: Record<string, Setlist[]> = {};
+export const mockBandMembers: Record<string, BandMember[]> = {};
+export const mockFavorites: string[] = [];
+export const mockInviteCodes: Record<string, string> = {};
+export const mockVenueTRTemplates: Record<string, VenueTRTemplate> = {};

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { mockBands, mockPerformances, mockOrganizations } from '@/lib/mock-data';
+import { mockBands, mockPerformances, mockOrganizations, mockBandMembers, mockInviteCodes, mockFavorites } from '@/lib/mock-data';
 import { formatDate, formatPrice } from '@/lib/utils';
 
 const BAND_COLORS = ['#F97316', '#06B6D4', '#A855F7', '#EC4899', '#22C55E', '#EAB308', '#EF4444', '#6366F1'];
@@ -55,7 +55,9 @@ const PART_EMOJIS: Record<string, string> = {
 export default function BandDetailPage() {
   const params = useParams();
   const id = params.id as string;
-  const [activeTab, setActiveTab] = useState<'performances' | 'members'>('performances');
+  const [activeTab, setActiveTab] = useState<'performances' | 'members' | 'photos'>('performances');
+  const [showInvite, setShowInvite] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(mockFavorites.includes(id));
 
   const band = mockBands.find((b) => b.id === id);
   const bandIndex = mockBands.findIndex((b) => b.id === id);
@@ -77,6 +79,8 @@ export default function BandDetailPage() {
   const org = orgId ? mockOrganizations.find((o) => o.id === orgId) : null;
   const bandPerformances = mockPerformances.filter((p) => p.bands.some((b) => b.id === band.id));
   const members = mockMembers[band.id] || [];
+  const extMembers = mockBandMembers[band.id] || [];
+  const inviteCode = mockInviteCodes[band.id] || '';
   const bandColor = BAND_COLORS[bandIndex % BAND_COLORS.length];
 
   return (
@@ -100,6 +104,18 @@ export default function BandDetailPage() {
               ))}
             </div>
             <p className="mt-2 text-sm text-muted">{band.description}</p>
+            <div className="mt-3 flex gap-2">
+              <button
+                onClick={() => setIsFavorite(!isFavorite)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
+                  isFavorite
+                    ? 'border-accent/30 bg-accent/10 text-accent'
+                    : 'border-white/[0.07] text-muted hover:text-stone-50'
+                }`}
+              >
+                {isFavorite ? '즐겨찾기 해제' : '즐겨찾기'}
+              </button>
+            </div>
           </div>
         </div>
 
@@ -145,6 +161,14 @@ export default function BandDetailPage() {
             >
               멤버
             </button>
+            <button
+              onClick={() => setActiveTab('photos')}
+              className={`pb-3 text-sm font-medium transition-colors ${
+                activeTab === 'photos' ? 'border-b-2 border-accent text-accent' : 'text-muted hover:text-stone-50'
+              }`}
+            >
+              사진
+            </button>
           </div>
         </div>
 
@@ -180,22 +204,64 @@ export default function BandDetailPage() {
         )}
 
         {activeTab === 'members' && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {members.length === 0 ? (
-              <p className="text-center py-8 text-muted col-span-2">멤버 정보가 없습니다.</p>
-            ) : (
-              members.map((member, idx) => (
-                <div key={idx} className="bg-surface-card border border-white/[0.07] rounded-[14px] p-4 flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-[11px] bg-surface-elevated flex items-center justify-center flex-shrink-0">
-                    <span className="text-sm">{PART_EMOJIS[member.part] || '🎵'}</span>
+          <div>
+            <div className="flex gap-2 mb-4">
+              <button
+                onClick={() => setShowInvite(!showInvite)}
+                className="px-4 py-2 rounded-lg text-xs font-medium border border-accent/30 bg-accent/10 text-accent hover:bg-accent/20"
+              >
+                멤버 초대
+              </button>
+            </div>
+
+            {showInvite && (
+              <div className="bg-surface-card border border-white/[0.07] rounded-[14px] p-4 mb-4">
+                <p className="text-xs font-medium text-muted mb-2">초대 코드</p>
+                {inviteCode ? (
+                  <div className="flex items-center gap-2">
+                    <code className="px-3 py-2 bg-surface-elevated rounded text-sm font-mono text-stone-50 flex-1">{inviteCode}</code>
+                    <button
+                      onClick={() => { navigator.clipboard.writeText(inviteCode); alert('복사되었습니다.'); }}
+                      className="px-3 py-2 bg-white/[0.06] text-muted rounded text-sm hover:bg-white/[0.1]"
+                    >
+                      복사
+                    </button>
                   </div>
-                  <div>
-                    <p className="font-bold text-stone-50">{member.name}</p>
-                    <p className="text-xs text-muted font-mono-space">{member.part}</p>
-                  </div>
-                </div>
-              ))
+                ) : (
+                  <p className="text-xs text-muted">초대 코드가 없습니다.</p>
+                )}
+              </div>
             )}
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {members.length === 0 ? (
+                <p className="text-center py-8 text-muted col-span-2">멤버 정보가 없습니다.</p>
+              ) : (
+                members.map((member, idx) => (
+                  <div key={idx} className="bg-surface-card border border-white/[0.07] rounded-[14px] p-4 flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-[11px] bg-surface-elevated flex items-center justify-center flex-shrink-0">
+                      <span className="text-sm">{PART_EMOJIS[member.part] || '🎵'}</span>
+                    </div>
+                    <div>
+                      <p className="font-bold text-stone-50">{member.name}</p>
+                      <p className="text-xs text-muted font-mono-space">{member.part}</p>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'photos' && (
+          <div className="text-center py-12">
+            <p className="text-muted mb-4">등록된 사진이 없습니다.</p>
+            <button
+              onClick={() => alert('사진 업로드 기능은 준비 중입니다.')}
+              className="px-5 py-2 rounded-lg text-xs font-medium border border-accent/30 bg-accent/10 text-accent hover:bg-accent/20"
+            >
+              사진 업로드
+            </button>
           </div>
         )}
 
