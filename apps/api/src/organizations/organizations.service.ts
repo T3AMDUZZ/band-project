@@ -54,6 +54,10 @@ export class OrganizationsService {
         type: dto.type as any,
         description: dto.description,
         profileImage: dto.profileImage,
+        coverImage: dto.coverImage,
+        school: dto.school,
+        region: dto.region,
+        snsLinks: dto.snsLinks,
         members: {
           create: {
             userId,
@@ -80,6 +84,10 @@ export class OrganizationsService {
         type: dto.type as any,
         description: dto.description,
         profileImage: dto.profileImage,
+        coverImage: dto.coverImage,
+        school: dto.school,
+        region: dto.region,
+        snsLinks: dto.snsLinks,
       },
       include: {
         members: { include: { user: true } },
@@ -138,6 +146,7 @@ export class OrganizationsService {
     authorId: string,
     title: string,
     content: string,
+    isPinned?: boolean,
   ) {
     const isAdminUser = await this.isAdmin(orgId, authorId);
     if (!isAdminUser) {
@@ -150,6 +159,7 @@ export class OrganizationsService {
         authorId,
         title,
         content,
+        isPinned: isPinned ?? false,
       },
     });
   }
@@ -159,7 +169,10 @@ export class OrganizationsService {
 
     return this.prisma.announcement.findMany({
       where: { organizationId: orgId },
-      orderBy: { createdAt: 'desc' },
+      orderBy: [
+        { isPinned: 'desc' },
+        { createdAt: 'desc' },
+      ],
     });
   }
 

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createBand } from '@/lib/api/bands';
 import { getOrganizations } from '@/lib/api/organizations';
+import RequireAuth from '@/components/auth/require-auth';
 
 const GENRE_OPTIONS = ['인디록', '얼터너티브', '팝록', '어쿠스틱', '포크', '포스트록', '개러지록', '기타'];
 const inputClass = "w-full px-4 py-2.5 bg-surface border border-white/[0.07] rounded-lg text-stone-50 text-sm placeholder-muted focus:ring-2 focus:ring-accent/50 focus:border-accent/30 outline-none transition-all";
@@ -54,6 +55,7 @@ export default function NewBandPage() {
   };
 
   return (
+    <RequireAuth>
     <section className="py-16 min-h-screen">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-3 mb-8">
@@ -107,5 +109,6 @@ export default function NewBandPage() {
         </form>
       </div>
     </section>
+    </RequireAuth>
   );
 }

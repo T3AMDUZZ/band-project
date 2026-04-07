@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsInt, IsArray } from 'class-validator';
+import { IsString, IsOptional, IsInt, IsArray, IsNumber } from 'class-validator';
 
 export class UpdateVenueDto {
   @IsOptional()
@@ -10,16 +10,26 @@ export class UpdateVenueDto {
   address?: string;
 
   @IsOptional()
+  @IsNumber()
+  latitude?: number;
+
+  @IsOptional()
+  @IsNumber()
+  longitude?: number;
+
+  @IsOptional()
+  @IsString()
+  phone?: string;
+
+  @IsOptional()
   @IsInt()
   capacity?: number;
 
   @IsOptional()
-  @IsString()
-  operatingHours?: string;
+  operatingHours?: any;
 
   @IsOptional()
-  @IsString()
-  rentalFee?: string;
+  rentalFee?: any;
 
   @IsOptional()
   @IsString()
@@ -29,4 +39,9 @@ export class UpdateVenueDto {
   @IsArray()
   @IsString({ each: true })
   photos?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  amenities?: string[];
 }

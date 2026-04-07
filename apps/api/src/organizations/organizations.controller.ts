@@ -88,6 +88,7 @@ export class OrganizationsController {
       user.id,
       dto.title,
       dto.content,
+      dto.isPinned,
     );
   }
 }

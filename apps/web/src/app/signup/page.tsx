@@ -28,7 +28,7 @@ export default function SignupPage() {
       await signup({ email: form.email, password: form.password, name: form.name, nickname: form.nickname });
       router.push('/myband');
     } catch (err: any) {
-      setError(err.response?.data?.message || '회원가입에 실패했습니다.');
+      setError(err.message || '회원가입에 실패했습니다.');
     } finally {
       setLoading(false);
     }

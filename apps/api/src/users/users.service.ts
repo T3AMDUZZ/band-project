@@ -8,6 +8,7 @@ const userSelect = {
   name: true,
   nickname: true,
   profileImage: true,
+  bio: true,
   createdAt: true,
   updatedAt: true,
 } as const;

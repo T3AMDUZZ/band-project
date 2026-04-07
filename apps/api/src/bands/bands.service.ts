@@ -56,13 +56,18 @@ export class BandsService {
   }
 
   async create(dto: CreateBandDto, userId: string) {
+    const inviteCode = this.generateInviteCode();
+
     return this.prisma.band.create({
       data: {
         name: dto.name,
         genre: dto.genre,
         description: dto.description,
         profileImage: dto.profileImage,
+        coverImage: dto.coverImage,
         snsLinks: dto.snsLinks,
+        status: dto.status as any,
+        inviteCode,
         organizationId: dto.organizationId,
         members: {
           create: {
@@ -83,6 +88,44 @@ export class BandsService {
     });
   }
 
+  private generateInviteCode(): string {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let code = '';
+    for (let i = 0; i < 8; i++) {
+      if (i === 4) code += '-';
+      code += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return code;
+  }
+
+  async joinByInviteCode(inviteCode: string, userId: string) {
+    const band = await this.prisma.band.findUnique({
+      where: { inviteCode },
+    });
+
+    if (!band) {
+      throw new NotFoundException('유효하지 않은 초대코드입니다.');
+    }
+
+    const existing = await this.prisma.bandMember.findUnique({
+      where: { bandId_userId: { bandId: band.id, userId } },
+    });
+
+    if (existing) {
+      return { message: '이미 멤버입니다.', band };
+    }
+
+    await this.prisma.bandMember.create({
+      data: {
+        bandId: band.id,
+        userId,
+        role: 'MEMBER',
+      },
+    });
+
+    return this.findOne(band.id);
+  }
+
   async update(id: string, dto: UpdateBandDto, userId: string) {
     if (!(await this.isAdmin(id, userId))) {
       throw new ForbiddenException('Only band admins can update band info');
@@ -95,7 +138,9 @@ export class BandsService {
         genre: dto.genre,
         description: dto.description,
         profileImage: dto.profileImage,
+        coverImage: dto.coverImage,
         snsLinks: dto.snsLinks,
+        status: dto.status as any,
         organizationId: dto.organizationId,
       },
     });

@@ -17,40 +17,44 @@ export class NotificationsService {
     }
   }
 
-  /** 알림 생성 + 푸시 전송 */
-  async sendNotification(params: {
-    recipientId: string;
-    reservationId?: string;
-    type: 'RESERVATION_APPROVED' | 'RESERVATION_REJECTED' | 'VENUE_ANNOUNCEMENT' | 'SHOW_REMINDER';
-    title: string;
-    body: string;
-  }) {
+  /** 알림 생성 + 푸시 전송 (다형성 지원) */
+  async sendNotification(
+    recipientId: string,
+    type: 'RESERVATION_APPROVED' | 'RESERVATION_REJECTED' | 'RESERVATION_REQUESTED' | 'VENUE_ANNOUNCEMENT' | 'SHOW_REMINDER' | 'ORG_ANNOUNCEMENT',
+    title: string,
+    body: string,
+    referenceId?: string,
+    referenceType?: string,
+  ) {
     // 1. DB에 알림 저장
     const notification = await this.prisma.notification.create({
       data: {
-        recipientId: params.recipientId,
-        reservationId: params.reservationId,
-        type: params.type,
-        title: params.title,
-        body: params.body,
+        recipientId,
+        type,
+        title,
+        body,
+        referenceId,
+        referenceType,
+        reservationId: referenceType === 'reservation' ? referenceId : undefined,
       },
     });
 
     // 2. 해당 유저의 푸시 구독 찾기
     const subscriptions = await this.prisma.pushSubscription.findMany({
-      where: { userId: params.recipientId },
+      where: { userId: recipientId },
     });
 
     // 3. 각 구독에 푸시 전송
     const payload = JSON.stringify({
-      title: params.title,
-      body: params.body,
+      title,
+      body,
       icon: '/icons/icon-192.png',
       badge: '/icons/icon-72.png',
       data: {
         notificationId: notification.id,
-        type: params.type,
-        reservationId: params.reservationId,
+        type,
+        referenceId,
+        referenceType,
       },
     });
 
@@ -107,13 +111,14 @@ export class NotificationsService {
     // 밴드 멤버 전원에게 알림
     const results = await Promise.allSettled(
       reservation.band.members.map((member) =>
-        this.sendNotification({
-          recipientId: member.userId,
-          reservationId,
-          type: type as any,
+        this.sendNotification(
+          member.userId,
+          type as any,
           title,
           body,
-        }),
+          reservationId,
+          'reservation',
+        ),
       ),
     );
 
@@ -138,13 +143,14 @@ export class NotificationsService {
 
     const results = await Promise.allSettled(
       reservation.band.members.map((member) =>
-        this.sendNotification({
-          recipientId: member.userId,
+        this.sendNotification(
+          member.userId,
+          'VENUE_ANNOUNCEMENT',
+          `${reservation.venue.name}: ${title}`,
+          message,
           reservationId,
-          type: 'VENUE_ANNOUNCEMENT',
-          title: `📢 ${reservation.venue.name}: ${title}`,
-          body: message,
-        }),
+          'reservation',
+        ),
       ),
     );
 

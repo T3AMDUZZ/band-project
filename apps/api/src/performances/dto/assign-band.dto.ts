@@ -6,6 +6,9 @@ export class AssignBandDto {
 
   @IsOptional()
   @IsInt()
-  @Min(1)
+  @Min(0)
   playOrder?: number;
+
+  @IsOptional()
+  setlist?: any;
 }

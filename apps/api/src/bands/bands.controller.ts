@@ -77,4 +77,13 @@ export class BandsController {
   ) {
     return this.bandsService.removeMember(id, targetUserId, user.id);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('join')
+  joinByInviteCode(
+    @Body('inviteCode') inviteCode: string,
+    @CurrentUser() user: any,
+  ) {
+    return this.bandsService.joinByInviteCode(inviteCode, user.id);
+  }
 }

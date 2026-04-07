@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { createPerformance, assignBandToPerformance } from '@/lib/api/performances';
 import { getVenues } from '@/lib/api/venues';
 import { getBands } from '@/lib/api/bands';
+import RequireAuth from '@/components/auth/require-auth';
 
 const inputClass = "w-full p-3 bg-surface border border-white/[0.07] rounded-lg text-stone-50 text-sm placeholder-muted focus:ring-2 focus:ring-accent/50 focus:border-accent/30 outline-none transition-all";
 
@@ -56,6 +57,7 @@ export default function NewPerformancePage() {
   };
 
   return (
+    <RequireAuth>
     <section className="py-12 min-h-screen">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-3 mb-2">
@@ -114,5 +116,6 @@ export default function NewPerformancePage() {
         </form>
       </div>
     </section>
+    </RequireAuth>
   );
 }

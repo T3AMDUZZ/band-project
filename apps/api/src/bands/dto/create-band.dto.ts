@@ -1,4 +1,5 @@
-import { IsString, IsOptional, IsArray } from 'class-validator';
+import { IsString, IsOptional, IsArray, IsEnum } from 'class-validator';
+import { BandStatus } from '@prisma/client';
 
 export class CreateBandDto {
   @IsString()
@@ -17,7 +18,15 @@ export class CreateBandDto {
   profileImage?: string;
 
   @IsOptional()
+  @IsString()
+  coverImage?: string;
+
+  @IsOptional()
   snsLinks?: any;
+
+  @IsOptional()
+  @IsEnum(BandStatus)
+  status?: BandStatus;
 
   @IsOptional()
   @IsString()

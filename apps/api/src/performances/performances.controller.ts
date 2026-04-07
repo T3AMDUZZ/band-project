@@ -14,6 +14,7 @@ import { CreatePerformanceDto } from './dto/create-performance.dto';
 import { UpdatePerformanceDto } from './dto/update-performance.dto';
 import { AssignBandDto } from './dto/assign-band.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
 
 @Controller('performances')
 export class PerformancesController {
@@ -31,8 +32,8 @@ export class PerformancesController {
 
   @Post()
   @UseGuards(JwtAuthGuard)
-  create(@Body() dto: CreatePerformanceDto) {
-    return this.performancesService.create(dto);
+  create(@Body() dto: CreatePerformanceDto, @CurrentUser() user: any) {
+    return this.performancesService.create(dto, user.id);
   }
 
   @Patch(':id')
@@ -50,7 +51,7 @@ export class PerformancesController {
   @Post(':id/bands')
   @UseGuards(JwtAuthGuard)
   assignBand(@Param('id') id: string, @Body() dto: AssignBandDto) {
-    return this.performancesService.assignBand(id, dto.bandId, dto.playOrder);
+    return this.performancesService.assignBand(id, dto.bandId, dto.playOrder, dto.setlist);
   }
 
   @Delete(':id/bands/:bandId')

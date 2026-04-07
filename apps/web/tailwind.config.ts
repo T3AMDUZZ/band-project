@@ -22,9 +22,9 @@ const config: Config = {
         subtle: '#A8A29E',
       },
       fontFamily: {
-        display: ['Bebas Neue', 'sans-serif'],
-        'mono-space': ['Space Mono', 'monospace'],
-        sans: ['Noto Sans KR', '-apple-system', 'sans-serif'],
+        display: ['var(--font-display)', 'Bebas Neue', 'sans-serif'],
+        'mono-space': ['var(--font-mono-space)', 'Space Mono', 'monospace'],
+        sans: ['var(--font-sans)', 'Noto Sans KR', '-apple-system', 'sans-serif'],
       },
       borderColor: {
         DEFAULT: 'rgba(255, 255, 255, 0.07)',

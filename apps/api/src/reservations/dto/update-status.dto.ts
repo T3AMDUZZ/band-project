@@ -13,5 +13,5 @@ export class UpdateStatusDto {
 
   @IsOptional()
   @IsString()
-  response?: string;
+  replyMessage?: string;
 }

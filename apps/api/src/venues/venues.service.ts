@@ -46,12 +46,21 @@ export class VenuesService {
       data: {
         name: dto.name,
         address: dto.address,
+        latitude: dto.latitude,
+        longitude: dto.longitude,
+        phone: dto.phone,
         capacity: dto.capacity,
         operatingHours: dto.operatingHours,
         rentalFee: dto.rentalFee,
         description: dto.description,
         photos: dto.photos ?? [],
+        amenities: dto.amenities ?? [],
         managerId,
+      },
+      include: {
+        manager: {
+          select: { id: true, name: true, nickname: true },
+        },
       },
     });
   }
@@ -72,11 +81,15 @@ export class VenuesService {
       data: {
         name: dto.name,
         address: dto.address,
+        latitude: dto.latitude,
+        longitude: dto.longitude,
+        phone: dto.phone,
         capacity: dto.capacity,
         operatingHours: dto.operatingHours,
         rentalFee: dto.rentalFee,
         description: dto.description,
         photos: dto.photos,
+        amenities: dto.amenities,
       },
     });
   }
@@ -99,6 +112,7 @@ export class VenuesService {
     venueId: string,
     date: string,
     status: AvailabilityStatus,
+    note?: string,
   ) {
     const venue = await this.prisma.venue.findUnique({
       where: { id: venueId },
@@ -112,8 +126,8 @@ export class VenuesService {
 
     return this.prisma.venueAvailability.upsert({
       where: { venueId_date: { venueId, date: dateObj } },
-      update: { status },
-      create: { venueId, date: dateObj, status },
+      update: { status, note },
+      create: { venueId, date: dateObj, status, note },
     });
   }
 

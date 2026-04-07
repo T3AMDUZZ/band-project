@@ -21,7 +21,7 @@ export default function LoginPage() {
       await login(email, password);
       router.push('/myband');
     } catch (err: any) {
-      setError(err.response?.data?.message || '로그인에 실패했습니다.');
+      setError(err.message || '로그인에 실패했습니다.');
     } finally {
       setLoading(false);
     }

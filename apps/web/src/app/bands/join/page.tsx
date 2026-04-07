@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import RequireAuth from '@/components/auth/require-auth';
 
 export default function BandJoinPage() {
   const router = useRouter();
@@ -21,6 +22,7 @@ export default function BandJoinPage() {
   };
 
   return (
+    <RequireAuth>
     <section className="py-12 bg-gray-50 min-h-screen">
       <div className="max-w-md mx-auto px-4">
         <h1 className="text-2xl font-bold text-gray-900 mb-2">밴드 가입</h1>
@@ -50,5 +52,6 @@ export default function BandJoinPage() {
         </form>
       </div>
     </section>
+    </RequireAuth>
   );
 }

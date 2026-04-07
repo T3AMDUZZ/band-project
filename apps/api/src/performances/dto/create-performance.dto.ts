@@ -26,6 +26,14 @@ export class CreatePerformanceDto {
 
   @IsOptional()
   @IsString()
+  startTime?: string;
+
+  @IsOptional()
+  @IsString()
+  endTime?: string;
+
+  @IsOptional()
+  @IsString()
   venueId?: string;
 
   @IsOptional()

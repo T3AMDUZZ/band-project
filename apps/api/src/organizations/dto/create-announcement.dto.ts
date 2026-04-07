@@ -1,4 +1,4 @@
-import { IsString } from 'class-validator';
+import { IsString, IsOptional, IsBoolean } from 'class-validator';
 
 export class CreateAnnouncementDto {
   @IsString()
@@ -6,4 +6,8 @@ export class CreateAnnouncementDto {
 
   @IsString()
   content: string;
+
+  @IsOptional()
+  @IsBoolean()
+  isPinned?: boolean;
 }

@@ -75,6 +75,6 @@ export class VenuesController {
     @Body() dto: SetAvailabilityDto,
     @CurrentUser() user: any,
   ) {
-    return this.venuesService.setAvailability(id, dto.date, dto.status);
+    return this.venuesService.setAvailability(id, dto.date, dto.status, dto.note);
   }
 }

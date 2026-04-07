@@ -52,14 +52,17 @@ export class ReservationsService {
     });
   }
 
-  async create(dto: CreateReservationDto) {
-    return this.prisma.reservation.create({
+  async create(dto: CreateReservationDto, userId: string) {
+    const reservation = await this.prisma.reservation.create({
       data: {
         bandId: dto.bandId,
         venueId: dto.venueId,
+        requestedBy: userId,
         date: new Date(dto.date),
         startTime: dto.startTime,
         endTime: dto.endTime,
+        eventType: dto.eventType ?? 'concert',
+        expectedSize: dto.expectedSize,
         message: dto.message,
       },
       include: {
@@ -67,12 +70,24 @@ export class ReservationsService {
         venue: true,
       },
     });
+
+    // 공연장 관리자에게 새 예약 요청 알림
+    await this.notificationsService.sendNotification(
+      reservation.venue.managerId,
+      'RESERVATION_REQUESTED',
+      `새 예약 요청: ${reservation.band.name}`,
+      `${reservation.startTime}-${reservation.endTime} / ${reservation.eventType}`,
+      reservation.id,
+      'reservation',
+    );
+
+    return reservation;
   }
 
   async updateStatus(
     id: string,
     status: string,
-    response?: string,
+    replyMessage?: string,
     userId?: string,
   ) {
     const reservation = await this.prisma.reservation.findUnique({
@@ -93,7 +108,7 @@ export class ReservationsService {
       where: { id },
       data: {
         status: status as any,
-        response,
+        replyMessage,
       },
       include: {
         band: true,
@@ -106,7 +121,7 @@ export class ReservationsService {
       await this.notificationsService.notifyReservationUpdate(
         id,
         status as 'APPROVED' | 'REJECTED',
-        response,
+        replyMessage,
       );
     }
 

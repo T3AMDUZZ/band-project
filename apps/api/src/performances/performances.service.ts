@@ -44,16 +44,19 @@ export class PerformancesService {
     return performance;
   }
 
-  async create(dto: CreatePerformanceDto) {
+  async create(dto: CreatePerformanceDto, userId: string) {
     return this.prisma.performance.create({
       data: {
         title: dto.title,
         description: dto.description,
         date: new Date(dto.date),
+        startTime: dto.startTime,
+        endTime: dto.endTime,
         venueId: dto.venueId,
         ticketPrice: dto.ticketPrice,
         posterImage: dto.posterImage,
         status: dto.status as any,
+        createdBy: userId,
       },
       include: {
         venue: true,
@@ -91,14 +94,15 @@ export class PerformancesService {
     return this.prisma.performance.delete({ where: { id } });
   }
 
-  async assignBand(performanceId: string, bandId: string, playOrder?: number) {
+  async assignBand(performanceId: string, bandId: string, playOrder?: number, setlist?: any) {
     await this.findOne(performanceId);
 
     return this.prisma.performanceBand.create({
       data: {
         performanceId,
         bandId,
-        playOrder,
+        playOrder: playOrder ?? 0,
+        setlist,
       },
       include: {
         band: true,

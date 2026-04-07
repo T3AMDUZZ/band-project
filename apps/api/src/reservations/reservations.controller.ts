@@ -29,8 +29,8 @@ export class ReservationsController {
   }
 
   @Post()
-  create(@Body() dto: CreateReservationDto) {
-    return this.reservationsService.create(dto);
+  create(@Body() dto: CreateReservationDto, @CurrentUser() user: any) {
+    return this.reservationsService.create(dto, user.id);
   }
 
   @Patch(':id/status')
@@ -42,7 +42,7 @@ export class ReservationsController {
     return this.reservationsService.updateStatus(
       id,
       dto.status,
-      dto.response,
+      dto.replyMessage,
       user.id,
     );
   }

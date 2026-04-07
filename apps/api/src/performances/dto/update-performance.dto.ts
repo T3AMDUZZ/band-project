@@ -23,6 +23,14 @@ export class UpdatePerformanceDto {
 
   @IsOptional()
   @IsString()
+  startTime?: string;
+
+  @IsOptional()
+  @IsString()
+  endTime?: string;
+
+  @IsOptional()
+  @IsString()
   venueId?: string;
 
   @IsOptional()
