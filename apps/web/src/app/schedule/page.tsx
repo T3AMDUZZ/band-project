@@ -36,6 +36,7 @@ function ScheduleContent() {
   const [myBands, setMyBands] = useState<any[]>([]);
   const [view, setView] = useState<'calendar' | 'list'>('list');
   const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   // 캘린더 월 네비게이션
   const now = new Date();
@@ -43,8 +44,7 @@ function ScheduleContent() {
   const [month, setMonth] = useState(now.getMonth());
   const cells = getCalendarDays(year, month);
 
-  // 새 일정 폼
-  const [form, setForm] = useState({
+  const emptyForm = {
     band_id: '',
     type: 'rehearsal',
     title: '',
@@ -53,7 +53,8 @@ function ScheduleContent() {
     end_time: '21:00',
     location: '',
     memo: '',
-  });
+  };
+  const [form, setForm] = useState(emptyForm);
   const [formError, setFormError] = useState('');
 
   // 내 밴드 로드
@@ -85,8 +86,8 @@ function ScheduleContent() {
 
   useEffect(() => { loadSchedules(); }, [loadSchedules]);
 
-  // 일정 추가
-  const handleAdd = async (e: React.FormEvent) => {
+  // 일정 추가/수정
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError('');
     if (!form.title || !form.date || !form.band_id) {
@@ -97,25 +98,57 @@ function ScheduleContent() {
     const startAt = new Date(`${form.date}T${form.start_time}:00`);
     const endAt = new Date(`${form.date}T${form.end_time}:00`);
 
-    const { error } = await supabase.from('schedules').insert({
+    const payload = {
       band_id: form.band_id,
-      created_by: user!.id,
       type: form.type,
       title: form.title,
       start_at: startAt.toISOString(),
       end_at: endAt.toISOString(),
       location: form.location || null,
       memo: form.memo || null,
-    });
+    };
+
+    let error;
+    if (editingId) {
+      ({ error } = await supabase.from('schedules').update(payload).eq('id', editingId));
+    } else {
+      ({ error } = await supabase.from('schedules').insert({ ...payload, created_by: user!.id }));
+    }
 
     if (error) {
       setFormError(error.message);
       return;
     }
 
-    setForm({ band_id: form.band_id, type: 'rehearsal', title: '', date: '', start_time: '19:00', end_time: '21:00', location: '', memo: '' });
+    setForm({ ...emptyForm, band_id: form.band_id });
     setShowForm(false);
+    setEditingId(null);
     loadSchedules();
+  };
+
+  // 수정 시작
+  const handleEdit = (item: any) => {
+    const start = new Date(item.start_at);
+    const end = new Date(item.end_at);
+    setForm({
+      band_id: item.band_id,
+      type: item.type,
+      title: item.title,
+      date: `${start.getFullYear()}-${pad(start.getMonth() + 1)}-${pad(start.getDate())}`,
+      start_time: `${pad(start.getHours())}:${pad(start.getMinutes())}`,
+      end_time: `${pad(end.getHours())}:${pad(end.getMinutes())}`,
+      location: item.location || '',
+      memo: item.memo || '',
+    });
+    setEditingId(item.id);
+    setShowForm(true);
+  };
+
+  // 폼 취소
+  const handleCancel = () => {
+    setForm({ ...emptyForm, band_id: myBands[0]?.band_id || '' });
+    setShowForm(false);
+    setEditingId(null);
   };
 
   // 일정 삭제
@@ -159,7 +192,7 @@ function ScheduleContent() {
               </button>
             </div>
             <button
-              onClick={() => setShowForm(!showForm)}
+              onClick={() => showForm ? handleCancel() : setShowForm(true)}
               className="px-5 py-2 bg-accent text-surface font-bold rounded-lg hover:bg-accent-hover transition-colors text-sm"
             >
               {showForm ? '취소' : '+ 일정 추가'}
@@ -177,8 +210,8 @@ function ScheduleContent() {
 
         {/* 일정 추가 폼 */}
         {showForm && myBands.length > 0 && (
-          <form onSubmit={handleAdd} className="bg-surface-card border border-white/[0.07] rounded-[14px] p-6 mb-8 animate-fade-up">
-            <h2 className="font-bold text-stone-50 mb-4">새 일정</h2>
+          <form onSubmit={handleSubmit} className="bg-surface-card border border-white/[0.07] rounded-[14px] p-6 mb-8 animate-fade-up">
+            <h2 className="font-bold text-stone-50 mb-4">{editingId ? '일정 수정' : '새 일정'}</h2>
             {formError && <p className="text-red-400 text-sm mb-3">{formError}</p>}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
@@ -223,9 +256,14 @@ function ScheduleContent() {
                 <input type="text" value={form.memo} onChange={e => setForm({ ...form, memo: e.target.value })} placeholder="참고 사항" className={inputClass} />
               </div>
             </div>
-            <div className="mt-5 flex justify-end">
+            <div className="mt-5 flex justify-end gap-3">
+              {editingId && (
+                <button type="button" onClick={handleCancel} className="px-6 py-2.5 border border-white/[0.1] text-subtle rounded-lg hover:bg-white/[0.04] transition-colors text-sm">
+                  취소
+                </button>
+              )}
               <button type="submit" className="px-6 py-2.5 bg-accent text-surface font-bold rounded-lg hover:bg-accent-hover transition-colors text-sm">
-                일정 등록
+                {editingId ? '수정 완료' : '일정 등록'}
               </button>
             </div>
           </form>
@@ -259,15 +297,26 @@ function ScheduleContent() {
                         {item.memo && <p className="text-sm text-subtle mt-0.5">{item.memo}</p>}
                       </div>
                     </div>
-                    <button
-                      onClick={() => handleDelete(item.id)}
-                      className="flex-shrink-0 p-2 text-muted hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
-                      title="삭제"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                    </button>
+                    <div className="flex flex-shrink-0 gap-1">
+                      <button
+                        onClick={() => handleEdit(item)}
+                        className="p-2 text-muted hover:text-accent hover:bg-accent/10 rounded-lg transition-colors"
+                        title="수정"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                      </button>
+                      <button
+                        onClick={() => handleDelete(item.id)}
+                        className="p-2 text-muted hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+                        title="삭제"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </div>
                   </div>
                 );
               })

@@ -33,7 +33,7 @@ export default function Header() {
       .then(({ data }) => setIsVenueManager((data ?? []).length > 0));
   }, [user, supabase]);
 
-  const navLinks = isAuthenticated
+  const navLinks = (!isLoading && isAuthenticated)
     ? [...publicLinks, ...authLinks]
     : publicLinks;
 
